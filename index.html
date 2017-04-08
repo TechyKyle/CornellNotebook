@@ -1,0 +1,301 @@
+<html>
+<head>
+    
+    
+     <link rel='stylesheet' href='desktop.css' />
+    
+       <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.js"></script>
+       <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.15/jquery.touchSwipe.min.js"></script>
+  <script language="javascript" type="text/javascript" src="javascript.js"></script>
+<script src="https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js"></script>
+  
+    
+    <title>Cornell Notebook</title>
+    
+      <script type="text/javascript">
+      $(window).load(function(){
+        $("[data-toggle]").click(function() {
+          var toggle_el = $(this).data("toggle");
+          $(toggle_el).toggleClass("open-sidebar");
+        });
+         $(".swipe-area").swipe({
+              swipeStatus:function(event, phase, direction, distance, duration, fingers)
+                  {
+                      if (phase=="move" && direction =="right") {
+                           $(".container").addClass("open-sidebar");
+                           return false;
+                      }
+                      if (phase=="move" && direction =="left") {
+                           $(".container").removeClass("open-sidebar");
+                           return false;
+                      }
+                  }
+          }); 
+      });
+      
+    </script>
+ 
+ <script type="text/javascript">
+function Note(id,subject, message, date, topic, questions, summary) 
+{
+	this.id = id;
+	this.subject=subject;
+	this.message=message;
+	this.date=date;
+	this.topic=topic;
+	this.questions=questions;
+	this.summary=summary;
+};    
+
+function populate()
+{
+clear();
+var x;
+	for(var key=1;key<1;key++)
+	{
+	  x=new  Note( key,"Test subject "+key, "this is the message", "2/6/12");		   
+	  store(key,x);
+	}
+list();
+}
+
+function store( key, value)
+{      
+  window.localStorage.setItem(key,JSON.stringify(value));	  
+}  
+
+function remove (key)
+{		     
+	localStorage.removeItem(key);
+	list();	   
+}
+
+function clear()
+{
+  localStorage.clear();   
+}
+
+function get (key)
+{
+  return JSON.parse(localStorage.getItem(key));
+}
+
+function list()
+{
+var html="<table>";
+for (var i=0; i < localStorage.length; i++) {	
+	 q=get(   localStorage.key(i));
+  
+	 if(q.id !=undefined)
+	 html+="<div class'menuList'><table class='itemIcon'  border='1' cellpadding='8' cellspacing='3'><tr><td><img src='images/file.png'></tr><tr><td class='itemTitle'><h6>" +q.topic + "</h6></tr></table>";
+  
+}
+html+="</table>";
+document.getElementById("divList").innerHTML =html;	
+}
+
+
+function test()
+{	    	  
+var x=get("lastId");
+if(x==null) store("lastId", 0);
+else	 
+store("lastId",x+1);   	  
+document.getElementById("id").value=x+1;	 
+list(); 
+}
+
+function addItem()
+{
+var key = document.getElementById("id").value;
+var subject = document.getElementById("subject").value;		 
+var mess = document.getElementById("mess").value;
+var topic = document.getElementById("topic").value;
+var questions = document.getElementById("questions").value;
+var summary = document.getElementById("summary").value;
+var date =  getDate();
+x=new  Note( key, subject, mess, date, topic, questions, summary);		   
+  store(key,x);
+  var x=get("lastId");
+  var	 q=get(x);
+  list();
+  
+}
+
+function searchItem( val)
+{
+document.getElementById("body").innerHTML=""; 
+var q;
+var html="<table>";
+for (var i=1; i < localStorage.length-1; i++)
+{	
+	 q=get(   i 	);
+	 if(q !=null)
+	 {
+	 var subj=	q.subject.toLowerCase();
+	 var mess=  q.message.toLowerCase();
+	 val = val.toLowerCase();
+
+  if(subj.indexOf(val) >-1 || mess.indexOf(val) >-1 )
+	   {
+			 html+="<tr><td><input type=button value='" +  q.id + "' onclick ='remove(this.value);' /><td><td>" +q.subject + "</td><td>" + q.message + "</td><td style='visibility:hidden'>" +q.date + "</td></tr></div>";				 
+	   }
+	 }
+}
+	 html+="</table>";
+	 document.getElementById("divList").innerHTML =html; 
+}	
+
+function pop()
+{	  	 
+	clear();
+	populate()
+}
+
+function getDate()
+{
+   var currentTime = new Date()
+var month = currentTime.getMonth() + 1
+var day = currentTime.getDate()
+var year = currentTime.getFullYear()
+return month + "/" + day + "/" + year;
+
+
+
+}
+</script>
+
+ 
+    
+    </head>
+    <body id="body" onload="test()">
+        
+          <button onclick="myFunctionOpen()"class="add" id="addBtn">+</button>
+        
+         <div id="addScreen">
+           <div class="noteheader">
+         &nbsp; <strong><h1 class ="close" onclick="myFunctionClose()" >X</h1></strong>
+         <tr><Td></td><td> <input type="text" name="topic" id="topic" placeholder="Untitled Document" ></input>	</td></tr>
+        
+        </div>
+        <div class="toolbar">
+           <a href="javascript:addItem();"> <img src="images/content-save.png"/></a>
+         <img src="images/format-bold.png"/>
+         <img src="images/format-italic.png"/>
+         &nbsp; &nbsp;
+         <img src="images/format-list-bulleted.png"/>
+         <img src="images/format-list-numbers.png"/>
+         &nbsp; &nbsp;
+         <img src="images/star.png"/>
+         <img src="images/format-underline.png"/>
+         <img src="images/format-color-fill.png"/>
+        </div>
+         
+<table class="fieldTable">
+<tr style=visibility:hidden;><Td>   ID: </td><td><input type="text" name="id" id="id" value="1">	</td></tr>
+
+<tr> <td></td><td> <textarea placeholder="Essential Question" type="text" name="subject" id="subject" > Essential Question: </textarea></td></tr> 	
+<tr><Td></td><td> <textarea placeholder="Notes" type="textarea" name="mess" id="mess" > Notes:</textarea>	</td></tr>
+<tr><Td></td><td> <textarea  type="text" name="questions" id="questions" >Questions:
+</textarea>	</td></tr>
+<tr><Td></td><td> <textarea placeholder="Summary" type="text" name="summary" id="summary" >Summary:</textarea>	</td></tr>
+
+
+<tr style="visibility:hidden"><td colspan=2><input type="submit" value="Add" onclick="addItem();"></td></tr>
+
+
+<tr style="visibility:hidden;"><td colspan=2><input type="submit" id="listbtn" value="List"   onclick="test();"></td></tr>
+<tr style="visibility:hidden;><td colspan=2><input type="submit" id="popbtn" value="Populate"  onclick="pop();"></td></tr>	
+</table> 
+
+                </div>
+                </div>
+        
+       
+       
+       <div class="container">
+           
+           <header>
+               
+          <h1 class="apptitle">Cornell Notebook</h1>
+        
+          </header>
+           
+           
+             
+           
+           
+      <div id="sidebar">
+          <ul>
+          <br>
+          <input type="search" placeholder="Search"><br><br>
+              <li> <a href="http://msn.com">Green</a></li>
+              <li><a href="javascript:(increase())">Blue</a></li>
+              <li><a href="">Purple</a></li>
+                  <li><a href="#">Yellow</a></li>
+                   <li><a href="">Orange</a></li>
+                  <li><a href="#">Red</a></li>
+                  <li><a href="">Grey</a></li>
+                  
+          </ul>
+         
+          
+          
+
+      </div>
+           
+           
+           <div class="body">
+       <div id="divList"></div>       
+       
+          
+    
+         
+               
+
+            
+           
+           
+      <div class="main-content">
+          <div class="swipe-area"></div>
+          <br>
+          
+          <a href="#" data-toggle=".container" id="sidebar-toggle">
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+          </a>
+          
+           </div>
+           
+         
+            
+       </div>
+        
+          <script>
+                   function myFunctionOpen()
+{
+    var myElement = document.querySelector("#addScreen");
+myElement.style.display = "initial";
+var myElement2 = document.querySelector("#addBtn");
+myElement2.style.display = "none";
+test();
+}
+                   
+               </script>
+               <script>
+                   function myFunctionClose()
+{
+    var myElement = document.querySelector("#addScreen");
+myElement.style.display = "none";
+var myElement2 = document.querySelector("#addBtn");
+myElement2.style.display = "initial";
+}
+                   
+               </script>
+ 
+    </body>
+   
+</html>
